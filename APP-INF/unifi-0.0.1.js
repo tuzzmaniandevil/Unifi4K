@@ -65,7 +65,7 @@
 
     /**
      * Get a list of connected clients for this site
-     * @param {type} cb - Called when GET is finished, params (err {boolean}, data {json})
+     * @param {type} cb - Called when GET is finished, params (data {json})
      * @returns {JSON}
      */
     UniFi.prototype.getClients = function (cb) {
@@ -77,7 +77,7 @@
     /**
      * Get a list of devices for this site
      * @param {type} site - the site name to use, if none specified the options default will be used
-     * @param {type} cb
+     * @param {type} cb - Called when GET is finished, params (data {json})
      * @returns {Array|Object|text}
      */
     UniFi.prototype.getDevices = function (site, cb) {
@@ -106,13 +106,21 @@
 
     /**
      * Get a list of vouchers for this site
-     * @param {type} cb - Called when GET is finished, params (err {boolean}, data {json})
+     * @param {String} site - the site name to use, if none specified the options default will be used
+     * @param {type} cb - Called when GET is finished, params (data {json})
      * @returns {JSON}
      */
-    UniFi.prototype.getVouchers = function (cb) {
+    UniFi.prototype.getVouchers = function (site, cb) {
         var _self = this;
 
-        return _self._doGet('/api/s/' + _self._options.site + '/stat/voucher', cb);
+        if (typeof site === 'function') {
+            cb = site;
+            site = null;
+        }
+
+        var s = site || _self._options.site;
+
+        return _self._doGet('/api/s/' + s + '/stat/voucher', cb);
     };
 
     /**
@@ -143,7 +151,7 @@
     /**
      *
      * @param {String} path
-     * @param {Function} cb - Called when GET is finished, params (err {boolean}, data {json})
+     * @param {Function} cb - Called when GET is finished, params (data {json})
      * @param {boolean} autologin - (optional) Overrides the auto login flag
      */
     UniFi.prototype._doGet = function (path, cb, autologin) {
@@ -156,7 +164,7 @@
      * 
      * @param {String} path
      * @param {JSON|String} data - a String or JSON (which will be stringified) to send as the body
-     * @param {Function} cb - Called when POST is finished, params (err {boolean}, data {json})
+     * @param {Function} cb - Called when POST is finished, params (data {json})
      * @param {boolean} autologin - (optional) Overrides the auto login flag
      * @returns {JSON}
      */
@@ -171,7 +179,7 @@
      * @param {String} path
      * @param {String} type - The type of request to make, e.g. POST or GET
      * @param {JSON|String} data - a String or JSON (which will be stringified) to send as the body
-     * @param {Function} cb - Called when the request is finished, params (err {boolean}, data {json})
+     * @param {Function} cb - Called when the request is finished, params (data {json})
      * @param {boolean} autologin - (optional) Overrides the auto login flag
      * @returns {JSON}
      */
@@ -184,33 +192,31 @@
         xmlhttp.open(type, 'https://' + _self._options.hostname + ':' + _self._options.port + path, false);
         xmlhttp.setRequestHeader('Cookie', _self._cookie);
 
-        var result = null;
+        var result = {
+            status: false,
+            data: null
+        };
 
         xmlhttp.onloadend = function () {
             var resp = xmlhttp.response;
             var statusCode = resp.statusCode;
             var text = xmlhttp.responseText;
+
             if (text.length > 0) {
                 try {
-                    result = JSON.parse(xmlhttp.responseText);
-                } catch (err) {
-                    // TODO Handle error parsing JSON
+                    result.data = JSON.parse(xmlhttp.responseText);
+                } catch (ex) {
+                    log.error('Error parsing JSON: {}', ex.message);
                 }
             }
 
             if (statusCode === 401 && al) { // Not logged in and auto login enabled.
-                var result = _self.login();
-                if (result) {
-                    result = _self._doGet(path, cb);
-                } else {
-                    cb(true, result);
+                var lg = _self.login();
+                if (lg) {
+                    result = _self._doHttpRequest(path, type, data, cb, autologin);
                 }
-            } else if (cb && typeof cb === 'function') {
-                var err = false;
-                if (statusCode !== 200) {
-                    err = true;
-                }
-                cb(err, result);
+            } else if (statusCode === 200) {
+                result.status = true;
             }
         };
 
@@ -221,6 +227,10 @@
             xmlhttp.send(data);
         } else {
             xmlhttp.send();
+        }
+
+        if (cb && typeof cb === 'function') {
+            cb(result);
         }
 
         return result;

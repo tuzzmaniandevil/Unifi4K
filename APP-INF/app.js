@@ -9,13 +9,16 @@ function testUniFi() {
     var opt = {
         hostname: 'unifi.tuzza.co',
         username: 'admin',
-        password: 'Dylan3814',
-        site: 'stzhb504'
+        password: 'Dylan3814'
     };
 
     var unifi = new UniFi(opt);
 
-    var d = unifi.getSites();
+    var result = {};
 
-    return views.textView('Data: ' + JSON.stringify(d));
+    unifi.getVouchers('stzhb504', function (resp) {
+        result = resp;
+    });
+
+    return views.textView(JSON.stringify(result));
 }
