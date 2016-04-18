@@ -117,9 +117,9 @@
 
     /**
      * Deletes a voucher with the specified ID
-     * @param {type} id - The ID of the voucher to delete
-     * @param {type} site - the site name to use, if none specified the options default will be used
-     * @param {type} cb
+     * @param {String} id - The ID of the voucher to delete
+     * @param {String} site - the site name to use, if none specified the options default will be used
+     * @param {Function} cb
      * @returns {JSON}
      */
     UniFi.prototype.deleteVoucher = function (id, site, cb) {
@@ -154,10 +154,10 @@
 
     /**
      * 
-     * @param {type} path
-     * @param {type} data - a String or JSON (which will be stringified) to send as the body
-     * @param {type} cb - Called when POST is finished, params (err {boolean}, data {json})
-     * @param {type} autologin - (optional) Overrides the auto login flag
+     * @param {String} path
+     * @param {JSON|String} data - a String or JSON (which will be stringified) to send as the body
+     * @param {Function} cb - Called when POST is finished, params (err {boolean}, data {json})
+     * @param {boolean} autologin - (optional) Overrides the auto login flag
      * @returns {JSON}
      */
     UniFi.prototype._doPost = function (path, data, cb, autologin) {
@@ -168,11 +168,11 @@
 
     /**
      * 
-     * @param {type} path
-     * @param {type} type - The type of request to make, e.g. POST or GET
-     * @param {type} data - a String or JSON (which will be stringified) to send as the body
-     * @param {type} cb - Called when the request is finished, params (err {boolean}, data {json})
-     * @param {type} autologin - (optional) Overrides the auto login flag
+     * @param {String} path
+     * @param {String} type - The type of request to make, e.g. POST or GET
+     * @param {JSON|String} data - a String or JSON (which will be stringified) to send as the body
+     * @param {Function} cb - Called when the request is finished, params (err {boolean}, data {json})
+     * @param {boolean} autologin - (optional) Overrides the auto login flag
      * @returns {JSON}
      */
     UniFi.prototype._doHttpRequest = function (path, type, data, cb, autologin) {
