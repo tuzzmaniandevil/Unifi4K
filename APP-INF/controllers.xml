@@ -1,3 +1,4 @@
 <controllers>
+    <source>/APP-INF/unifi-0.0.1.js</source>
     <source>/APP-INF/app.js</source>
 </controllers>
