@@ -19,7 +19,7 @@
         }
 
         return db;
-    }
+    };
 
     g._setAllowAccess = function (jsonDB, allowAccess) {
         transactionManager.runInTransaction(function () {

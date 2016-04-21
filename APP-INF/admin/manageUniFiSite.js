@@ -59,7 +59,8 @@
             var d = populateFields(params, {
                 createdDate: createdDate,
                 createdBy: createdBy,
-                siteId: siteId
+                siteId: siteId,
+                macs: []
             });
             var newCode = generateRandomCode(10);
             while (isNotNull(db.child(_config.RECORD_NAMES.VOUCHER(newCode)))) {
