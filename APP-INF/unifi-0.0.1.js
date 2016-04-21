@@ -75,7 +75,26 @@
     };
 
     /**
-     * Get a list of devices for this site
+     * Get's a list of authorized clients
+     * @param {type} site
+     * @param {type} cb
+     * @returns {unifi-0.0.1_L1.UniFi.prototype._doHttpRequest.result|JSON}
+     */
+    UniFi.prototype.getGuests = function (site, cb) {
+        var _self = this;
+
+        if (typeof site === 'function') {
+            cb = site;
+            site = null;
+        }
+
+        var s = site || _self._options.site;
+
+        return _self._doGet('/api/s/' + s + '/stat/guest', cb);
+    };
+
+    /**
+     * Get a list of unifi devices for this site
      * @param {type} site - the site name to use, if none specified the options default will be used
      * @param {type} cb - Called when GET is finished, params (data {json})
      * @returns {Array|Object|text}

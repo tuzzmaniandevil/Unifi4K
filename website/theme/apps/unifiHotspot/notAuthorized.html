@@ -1,0 +1,32 @@
+<html>
+    #parse("/theme/masterTemplate.html")
+    <head>
+        #@themeHeader( "UniFi Hotspot" )
+        #end
+    </head>
+    <body class="add-container">
+        #@themeBody()
+        <div>Welcome to our hotspot!</div>
+        <form id="voucher_form" class="form-inline">
+            <input type="hidden" name="mac" value="$request.params.id"/>
+            <div class="form-group">
+                <label for="voucherCode">Voucher </label>
+                <input type="text" name="voucherCode" class="form-control" id="voucherCode" placeholder="12345-67890">
+            </div>
+            <button type="submit" class="btn btn-default">Send</button>
+        </form>
+        #end
+
+        <script>
+            $(function () {
+                $('#voucher_form').forms({
+                    onSuccess: function (resp) {
+
+                    },
+                    onError: function () {
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>
