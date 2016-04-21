@@ -10,13 +10,43 @@
             .build();
 
     g._authClient = function (page, params) {
-        if (!params.containsKey('id') || !params.containsKey('ssid')) {
+        var device_mac = null;
+        var ssid = null;
+        if (params.containsKey('id')) {
+            var m = safeString(params.id);
+            if (isNotBlank(m)) {
+                device_mac = m;
+            }
+        }
+        if (isBlank(device_mac)) {
+            var mac_cookie = http.request.getCookie('mac');
+            if (isNotNull(mac_cookie) && isNotBlank(mac_cookie.value)) {
+                device_mac = mac_cookie.value;
+            }
+        }
+
+        if (params.containsKey('ssid')) {
+            var m = safeString(params.ssid);
+            if (isNotBlank(m)) {
+                ssid = m;
+            }
+        }
+        if (isBlank(ssid)) {
+            var cookie = http.request.getCookie('ssid');
+            if (isNotNull(cookie) && isNotBlank(cookie.value)) {
+                ssid = cookie.value;
+            }
+        }
+
+        if (isBlank(device_mac) || isBlank(ssid)) {
             return views.templateView('/theme/apps/unifiHotspot/missingParams.html');
         }
-        var device_mac = safeString(params.id);
+
         var myDevice = null;
 
         var devices = g._unifi.getGuests(page.attributes.siteName);
+
+        log.info('Devices {}', JSON.stringify(devices));
 
         if (devices.status) {
             for (var i in devices.data.data) {
@@ -30,12 +60,17 @@
 
         var response = http.response;
         response.setCookie('mac', device_mac);
-        response.setCookie('ssid', safeString(params.ssid));
-        response.setCookie('url', safeString(params.url));
+        if (isNotBlank(params.ssid)) {
+            response.setCookie('ssid', safeString(params.ssid));
+        }
+        if (isNotBlank(params.url)) {
+            response.setCookie('url', safeString(params.url));
+        }
 
         if (isNull(myDevice)) { // Not authorized
             return views.templateView('/theme/apps/unifiHotspot/notAuthorized.html');
         } else { // Authorized
+            page.attributes.myDevice = myDevice;
             return views.templateView('/theme/apps/unifiHotspot/authorized.html');
         }
     };

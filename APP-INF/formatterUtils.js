@@ -7,7 +7,7 @@ function isBlank(s) {
 }
 
 function trimToNull(s) {
-    if (s !== null) {
+    if (isNotNull(s)) {
         s = s.toString().trim();
         if (s.length === 0) {
             return null;

@@ -1,0 +1,16 @@
+<html>
+    #parse("/theme/masterTemplate.html")
+    <head>
+        #@themeHeader( "UniFi Hotspot" )
+        #end
+    </head>
+    <body class="add-container">
+        #@themeBody()
+        #set($d = $page.attributes.myDevice)
+        <br/>
+        #set($total = ($d.end - $d.start) / 60)
+        #set($tr = ($d.end - ($formatter.now.time / 1000)) / 60)
+        Time Remaining: $tr of $total Minutes 
+        #end
+    </body>
+</html>
