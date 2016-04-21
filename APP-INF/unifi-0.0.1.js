@@ -149,6 +149,63 @@
     };
 
     /**
+     * Authorize a guest
+     *
+     * @param {JSON} params - The params for the guest,
+     * {
+     *  mac: (String - Required) - The mac address of the client,
+     *  minutes: (Number - Required) - The number of minutes the client is authorized for
+     *  up: (Number - Optional) - The max upload speed in kbps
+     *  down: (Number - Optional) - The max download speed in kbps
+     *  bytes: (Number - Optional) - The max data they can use in MB
+     * }
+     * @param {String} site - the site name to use, if none specified the options default will be used
+     * @param {Function} cb
+     * @returns {JSON}
+     */
+    UniFi.prototype.authorizeGuest = function (params, site, cb) {
+        var _self = this;
+
+        if (typeof site === 'function') {
+            cb = site;
+            site = null;
+        }
+
+        var s = site || _self._options.site;
+
+        var opts = $.extend({}, params);
+        opts.cmd = 'authorize-guest';
+
+        return _self._doPost('/api/s/' + s + '/cmd/stamgr', opts, cb);
+    };
+
+    /**
+     * Unauthorize a guest
+     * 
+     * @param {type} mac - The mac address of the client to unauthorize (Required)
+     * @param {type} site - the site name to use, if none specified the options default will be used
+     * @param {type} cb
+     * @returns {unifi-0.0.1_L1.UniFi.prototype._doHttpRequest.result|JSON}
+     */
+    UniFi.prototype.unauthorizeGuest = function (mac, site, cb) {
+        var _self = this;
+
+        if (typeof site === 'function') {
+            cb = site;
+            site = null;
+        }
+
+        var s = site || _self._options.site;
+
+        var params = {
+            'cmd': 'unauthorize-guest',
+            'mac': mac
+        };
+
+        return _self._doPost('/api/s/' + s + '/cmd/stamgr', params, cb);
+    };
+
+    /**
      *
      * @param {String} path
      * @param {Function} cb - Called when GET is finished, params (data {json})
@@ -206,7 +263,6 @@
                 try {
                     result.data = JSON.parse(xmlhttp.responseText);
                 } catch (ex) {
-                    log.error('Error parsing JSON: {}', ex.message);
                 }
             }
 
