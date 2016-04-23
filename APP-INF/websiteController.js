@@ -67,7 +67,7 @@
             response.setCookie('url', safeString(params.url));
         }
 
-        if (isNull(myDevice)) { // Not authorized
+        if (isNull(myDevice) || myDevice.expired) { // Not authorized
             return views.templateView('/theme/apps/unifiHotspot/notAuthorized.html');
         } else { // Authorized
             page.attributes.myDevice = myDevice;
@@ -87,7 +87,7 @@
         }
 
         voucherCode = voucherCode.replaceAll("[^\\d]", "").trim();
-        var device_mac = safeString(mac_cookie.value);
+        var device_mac = safeString(mac_cookie.value).trim();
 
         if (isBlank(voucherCode)) {
             return page.jsonResult(false, "Voucher can't be blank.");
@@ -109,6 +109,10 @@
 
         if (isNull(voucherJson.macs)) {
             voucherJson.macs = [];
+        }
+
+        if (voucherJson.macs.indexOf(device_mac) > -1) {
+            return page.jsonResult(false, "This voucher has already been used.");
         }
 
         if (isNotNull(voucherJson.maxClients)) {
