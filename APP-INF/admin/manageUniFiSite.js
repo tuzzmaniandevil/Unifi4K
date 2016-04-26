@@ -10,10 +10,16 @@
             .adminController()
             .path("/unifiHotspot/(?<site>[^/]*)/$")
             .enabled(true)
-            .addMethod('GET', '_getVouchers')
             .addMethod('POST', '_addVoucher', 'createNew')
             .addPathResolver('site', '_resolveSite')
-            .defaultView(views.templateView('/theme/apps/unifiHotspot/manageUnifiSite.html'))
+            .build();
+
+    controllerMappings
+            .adminController()
+            .path("/unifiHotspot/(?<site>[^/]*)/site.json$")
+            .enabled(true)
+            .addMethod('GET', '_getVouchers')
+            .addPathResolver('site', '_resolveSite')
             .build();
 
     g._getVouchers = function (page) {
@@ -40,7 +46,28 @@
             }
         };
 
-        page.attributes.vouchers = db.search(JSON.stringify(voucherQuery));
+        var siteJson = JSON.parse(site.json);
+
+        var result = db.search(JSON.stringify(voucherQuery));
+        log.info('result {}', result);
+
+        var vouchers = [];
+
+        var vResult = JSON.parse(result.toString());
+        var hits = vResult.hits.hits;
+        
+         for (var i in hits) {
+         var h = hits[i];
+         
+         var json = h._source;
+         json.id = h._id;
+         
+         vouchers.push(json);
+         }
+         
+         siteJson.vouchers = vouchers;
+
+        return views.textView(JSON.stringify(siteJson), 'application/json');
     };
 
     g._addVoucher = function (page, params) {

@@ -1,0 +1,39 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <i class="clip-stack"></i>
+        Sites
+    </div>
+    <div class="panel-body">
+        <div style="padding-bottom: 15px">
+            <div class="btn-group btn-group-sm">
+                <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#modal-add-site"><i class="fa fa-plus"></i> Add new site</button>
+                <button class="btn btn-sm btn-success btn-sm dropdown-toggle" data-toggle="dropdown">
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu pull-right" role="menu">
+                    <li role="presentation">
+                        <a role="menuitem" href="#" tabindex="-1" class="reindex"><i class="fa fa-times"></i> Re-index</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <table class="table" id="site_table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Vouchers</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="site in sites">
+                    <td>
+                        <a href="#/sites/{{site.id}}">{{site.id}}</a>
+                    </td>
+                    <td>{{site.title}}</td>
+                    <td>{{site.voucherCount}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

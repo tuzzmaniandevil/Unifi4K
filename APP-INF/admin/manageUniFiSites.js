@@ -10,15 +10,21 @@
             .adminController()
             .path("/unifiHotspot/$")
             .enabled(true)
-            .addMethod('GET', '_getSites')
             .addMethod('POST', '_addSite', 'createNew')
-            .defaultView(views.templateView('/theme/apps/unifiHotspot/manageUnifiSites.html'))
+            .defaultView(views.templateView('/theme/apps/unifiHotspot/manageUnifiApp.html'))
+            .build();
+
+    controllerMappings
+            .adminController()
+            .path("/unifiHotspot/sites\.json$")
+            .enabled(true)
+            .addMethod('GET', '_getSites')
             .build();
 
     g._getSites = function (page, params) {
         var db = _getOrCreateUrlDb(page);
 
-        page.attributes.sites = db.findByType(_config.RECORD_TYPES.SITE);
+        var sites = db.findByType(_config.RECORD_TYPES.SITE);
 
         var voucherCountQuery = {
             "size": 0,
@@ -38,16 +44,31 @@
 
         var result = db.search(JSON.stringify(voucherCountQuery));
 
-        var json = JSON.parse(result.toString());
+        var resultJson = JSON.parse(result.toString());
 
         var m = formatter.newMap();
 
-        for (var i in json.aggregations.sites.buckets) {
-            var b = json.aggregations.sites.buckets[i];
+        for (var i in resultJson.aggregations.sites.buckets) {
+            var b = resultJson.aggregations.sites.buckets[i];
             m.put(b.key, b.doc_count);
         }
 
-        page.attributes.voucherCount = m;
+        var json = [];
+
+        for (var i in sites) {
+            var j = sites[i].json;
+            var jp = JSON.parse(j);
+            var voucherC = 0;
+            if (m.containsKey(jp.id)) {
+                voucherC = m.get(jp.id);
+            }
+
+            jp.voucherCount = voucherC;
+            
+            json.push(jp);
+        }
+
+        return views.textView(JSON.stringify(json), 'application/json');
     };
 
     g._addSite = function (page, params) {
