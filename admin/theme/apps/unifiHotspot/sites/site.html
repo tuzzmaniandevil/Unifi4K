@@ -16,16 +16,26 @@
                     <th>Down</th>
                     <th>Byte Quota</th>
                     <th>Duration</th>
+                    <th>Devices</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="v in site.vouchers">
-                    <td>{{v.code | limitTo:5:0}}-{{v.code | limitTo:5:5}}</td>
-                    <td>{{v.createdDate | date:'dd/MM/yyyy hh:mm a'}}</td>
+                    <td>{{v.code| limitTo:5:0}}-{{v.code| limitTo:5:5}}</td>
+                    <td>{{v.createdDate| date:'dd/MM/yyyy hh:mm a'}}</td>
                     <td>{{v.upLimit}}</td>
                     <td>{{v.downLimit}}</td>
                     <td>{{v.bytesLimit}}</td>
                     <td>{{v.minutes}}</td>
+                    <td>{{v.macs.length}}</td>
+                    <td>
+                        <span class="label" ng-class="{
+                            'label-success': (v.status === 'Valid'),
+                            'label-warning': (v.status === 'Used'),
+                            'label-error': (v.status === 'Expired')
+                        }">{{v.status}}</span>
+                    </td>
                 </tr>
             </tbody>
         </table>

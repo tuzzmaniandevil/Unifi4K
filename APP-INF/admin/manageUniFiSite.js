@@ -55,19 +55,28 @@
 
         var vResult = JSON.parse(result.toString());
         var hits = vResult.hits.hits;
-        
-         for (var i in hits) {
-         var h = hits[i];
-         
-         var json = h._source;
-         json.id = h._id;
-         
-         vouchers.push(json);
-         }
-         
-         siteJson.vouchers = vouchers;
 
-        return views.textView(JSON.stringify(siteJson), 'application/json');
+        for (var i in hits) {
+            var h = hits[i];
+
+            var json = h._source;
+            json.id = h._id;
+
+            if (!json.macs) {
+                json.macs = [];
+            }
+
+            json.status = 'Valid';
+            if (json.devices && json.macs.length >= json.devices) {
+                json.status = 'Used';
+            }
+
+            vouchers.push(json);
+        }
+
+        siteJson.vouchers = vouchers;
+
+        return views.textView(JSON.stringify(siteJson, null, '\t'), 'application/json');
     };
 
     g._addVoucher = function (page, params) {
