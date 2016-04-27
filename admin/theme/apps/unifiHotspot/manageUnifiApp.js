@@ -2,7 +2,7 @@
     'use strict';
 
     // Site Module
-    angular.module('unifiApp.site', ['ngRoute', 'ngResource', 'ui.bootstrap', 'ngTouch', 'ngAnimate'])
+    angular.module('unifiApp.site', ['ngRoute', 'ngResource', 'ngTouch', 'ngAnimate'])
             .config(['$routeProvider', function ($routeProvider) {
                     $routeProvider
                             .when('/sites/:siteId', {
@@ -17,8 +17,8 @@
                     };
                 }])
             .controller('siteCtrl',
-                    ['$scope', '$routeParams', '$http', '$uibModal', 'siteService',
-                        function ($scope, $routeParams, $http, $uibModal, siteService) {
+                    ['$scope', '$routeParams', '$http', 'siteService',
+                        function ($scope, $routeParams, $http, siteService) {
                             $scope.siteId = $routeParams.siteId;
                             $scope.site = siteService($scope.siteId);
 
@@ -26,10 +26,6 @@
 
                             $scope.refreshSite = function () {
                                 $scope.site = siteService($scope.siteId);
-                            };
-
-                            $scope.openAddVoucher = function () {
-
                             };
 
                             $scope.delVoucher = function (site) {
@@ -95,7 +91,7 @@
                                 $scope.location.path('/sites/' + sorted[0].id);
                                 return;
                             } else {
-                                site = "None";
+                                return "No sites";
                             }
                         }
 
