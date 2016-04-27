@@ -21,6 +21,10 @@
                         function ($scope, $routeParams, siteService) {
                             $scope.siteId = $routeParams.siteId;
                             $scope.site = siteService($scope.siteId);
+
+                            $scope.refreshSite = function () {
+                                $scope.site = siteService($scope.siteId);
+                            };
                         }
                     ]);
 
@@ -59,6 +63,10 @@
                         }
 
                         return false;
+                    };
+
+                    $scope.refreshSites = function () {
+                        $scope.sites = sitesService.getSites();
                     };
                 }
             ])

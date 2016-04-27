@@ -1,6 +1,13 @@
 <html>
     <head>
         <title>UniFi Hotspot</title>
+        <style>
+            .panel-tools {
+                position: absolute;
+                right: 5px;
+                top: 4px;
+            }
+        </style>
     </head>
     <body>
         <div ng-app="unifiApp" class="hide">
@@ -10,6 +17,11 @@
                         <div class="panel-heading">
                             <i class="clip-stack"></i>
                             Sites
+                            <div class="panel-tools">
+                                <button ng-click="refreshSites()" type="button" class="btn btn-success btn-sm">
+                                    <i class="fa fa-refresh"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="panel-body">
                             <div style="padding-bottom: 15px">
