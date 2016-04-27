@@ -51,6 +51,14 @@
         var siteName = _config.RECORD_NAMES.SITE(groupVal);
         return db.child(siteName);
     };
+
+    g._resolveVoucher = function (rf, groupName, groupVal, mapOfGroups) {
+        var db = _getOrCreateUrlDb(rf);
+
+        var voucherName = _config.RECORD_NAMES.VOUCHER(groupVal);
+        return db.child(voucherName);
+    };
+
 })(this);
 
 var siteMapping = {

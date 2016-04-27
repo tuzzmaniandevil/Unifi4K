@@ -23,6 +23,7 @@
                     <th>Duration</th>
                     <th>Devices</th>
                     <th>Status</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -38,11 +39,14 @@
                         <span class="label" ng-class="{
                             'label-success': (v.status === 'Valid'),
                             'label-warning': (v.status === 'Used'),
-                            'label-error': (v.status === 'Expired')
-                        }">{{v.status}}</span>
+                            'label-error': (v.status === 'Expired')}">
+                            {{v.status}}
+                        </span>
+                    </td>
+                    <td>
+                        <button type="button" ng-click="delVoucher(v)" class="btn btn-sm btn-danger" title="Delete"><i class="fa fa-times"></i></button>
                     </td>
                 </tr>
-                {{sitesLoaded()}}
             </tbody>
         </table>
     </div>
