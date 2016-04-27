@@ -3,9 +3,95 @@
         <title>UniFi Hotspot</title>
     </head>
     <body>
-        <div ng-app="unifiApp">
-            <div ng-view></div>
+        <div ng-app="unifiApp" class="hide">
+            <div class="row">
+                <div class="col-md-4" ng-controller="sitesCtrl">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="clip-stack"></i>
+                            Sites
+                        </div>
+                        <div class="panel-body">
+                            <div style="padding-bottom: 15px">
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#modal-add-site"><i class="fa fa-plus"></i> Add new site</button>
+                                    <button class="btn btn-sm btn-success btn-sm dropdown-toggle" data-toggle="dropdown">
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right" role="menu">
+                                        <li role="presentation">
+                                            <a role="menuitem" href="#"><i class="fa fa-times"></i> Re-index</a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="col-md-5 pull-right">
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" ng-model="sitesSearch" class="form-control" placeholder="Search" aria-describedby="search-addon">
+                                        <span class="input-group-addon" id="search-addon"><i class="fa fa-search"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <table class="table" id="site_table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Vouchers</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-click="location.path('/sites/' + site.id)" ng-repeat="site in sites| filter:sitesSearch" ng-class="{'bg-info': nav.isActive(site.id)}" class="clickable">
+                                        <td>{{site.id}}</td>
+                                        <td>{{site.title}}</td>
+                                        <td>{{site.voucherCount}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <div ng-view></div>
+                </div>
+            </div>
         </div>
+        <div id="loading">
+            <div class="center">
+                <i class="fa fa-refresh fa-5x fa-spin"></i>
+            </div>
+        </div>
+
+        <!-- Start Modal -->
+        <div id="modal-add-site" class="modal modal-md fade" aria-hidden="true">
+            <form action="." method="POST" class="form-horizontal">
+                <input class="action" type="hidden" name="createNew" value="createNew"/>
+                <div class="modal-header">
+                    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">&times;</button>
+                    <h4 class="modal-title">Add a new site</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="title">Title</label>
+                        <div class="col-md-8">
+                            <input class="form-control required" type="text" id="title" name="title" placeholder="e.g. Office" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="id">ID</label>
+                        <div class="col-md-8">
+                            <input class="form-control required" type="text" id="id" name="id" placeholder="e.g. default" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-default" data-dismiss="modal" type="button">Close</button>
+                    <button type="button" class="btn btn-sm btn-primary btn-create" data-type="form-submit">Create</button>
+                </div>
+            </form>
+        </div>
+        <!-- End Modal -->
 
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js">//</script>
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-route.min.js">//</script>

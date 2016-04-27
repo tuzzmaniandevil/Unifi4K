@@ -22,7 +22,7 @@
             </thead>
             <tbody>
                 <tr ng-repeat="v in site.vouchers">
-                    <td>{{v.code| limitTo:5:0}}-{{v.code| limitTo:5:5}}</td>
+                    <td>{{v.code| formatCode}}</td>
                     <td>{{v.createdDate| date:'dd/MM/yyyy hh:mm a'}}</td>
                     <td>{{v.upLimit}}</td>
                     <td>{{v.downLimit}}</td>
@@ -37,6 +37,7 @@
                         }">{{v.status}}</span>
                     </td>
                 </tr>
+                {{sitesLoaded()}}
             </tbody>
         </table>
     </div>
