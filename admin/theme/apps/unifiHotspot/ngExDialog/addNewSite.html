@@ -1,0 +1,21 @@
+﻿<div class="dialog-header">
+    <div class="dialog-title">Add a new site</div>
+</div>
+<div class="dialog-message dialog-body">
+    <div class="form-group">
+        <div>
+            <label for="txtProductName" class="col-sm-4 label-adjust">Site Name</label>
+            <input type="text" class="form-control" id="txtProductName" name="txtProductName"
+                   data-ng-model="newSite.name" required ng-maxlength="50" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="txtCategory" class="col-sm-4 label-adjust">Site Title</label>
+        <input type="text" class="form-control" id="txtCategory" name="txtCategory"
+               data-ng-model="newSite.title" required />
+    </div>
+</div>
+<div class="dialog-buttons dialog-footer">
+    <button type="button" class="dialog-button dialog-button-primary" data-ng-click="save()">Save</button>
+    <button type="button" class="dialog-button dialog-button-secondary" ng-click="cancel()">Cancel</button>
+</div>

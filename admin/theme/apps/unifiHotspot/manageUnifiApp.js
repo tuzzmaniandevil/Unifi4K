@@ -2,7 +2,7 @@
     'use strict';
 
     // Site Module
-    angular.module('unifiApp.site', ['ngRoute', 'ngResource', 'ngTouch', 'ngAnimate'])
+    angular.module('unifiApp.site', ['ngRoute', 'ngResource', 'ngAnimate'])
             .config(['$routeProvider', function ($routeProvider) {
                     $routeProvider
                             .when('/sites/:siteId', {
@@ -13,16 +13,26 @@
             ])
             .factory('siteService', ['$resource', function ($resource) {
                     return function (siteId) {
-                        return $resource('/unifiHotspot/' + siteId + '/site.json').get();
+                        var result;
+                        $.ajax({
+                            url: '/unifiHotspot/' + siteId + '/site.json',
+                            dataType: 'JSON',
+                            async: false
+                        }).done(function (data) {
+                            result = data;
+                        });
+                        return result;
                     };
                 }])
             .controller('siteCtrl',
-                    ['$scope', '$routeParams', '$http', 'siteService',
-                        function ($scope, $routeParams, $http, siteService) {
+                    ['$scope', '$routeParams', '$http', '$location', 'siteService',
+                        function ($scope, $routeParams, $http, $location, siteService) {
                             $scope.siteId = $routeParams.siteId;
                             $scope.site = siteService($scope.siteId);
 
-                            flog('site', $scope.site);
+                            if (angular.isUndefined($scope.site)) {
+                                $location.path('/sites');
+                            }
 
                             $scope.refreshSite = function () {
                                 $scope.site = siteService($scope.siteId);
@@ -46,24 +56,31 @@
     angular
             .module('unifiApp', [
                 'ngRoute',
+                'ngMaterial',
+                'ngExDialog',
                 'unifiApp.site'
             ])
-            .factory('sitesService', ['$resource', '$location', '$filter', function ($resource, $location, $filter) {
+            .factory('sitesService', ['$resource', '$location', function ($resource, $location) {
                     return {
                         getSites: function () {
-                            var result = $resource('/unifiHotspot/sites.json').query();
-                            return result;
+                            return $resource('/unifiHotspot/sites.json').query();;
                         },
-                        getLocation:
-                                function () {
-                                    return $location;
-                                }
+                        getLocation: function () {
+                            return $location;
+                        }
                     };
                 }
             ])
-            .controller('sitesCtrl', ['sitesService', '$scope', '$location', '$filter', function (sitesService, $scope, $location, $filter) {
-                    $scope.sites = sitesService.getSites();
+            .controller('sitesCtrl', ['sitesService', 'exDialog', '$scope', '$rootScope', '$location', '$filter', function (sitesService, exDialog, $scope, $rootScope, $location, $filter) {
+                    $rootScope.sites = sitesService.getSites();
+                    $scope.rootScope = $rootScope;
                     $scope.location = sitesService.getLocation();
+
+                    $scope.$on('$locationChangeStart', function (event, newUrl, oldUrl) {
+                        if (newUrl != oldUrl && exDialog.hasOpenDialog()) {
+                            exDialog.closeAll();
+                        }
+                    });
 
                     $scope.nav = {};
                     $scope.nav.isActive = function (siteId) {
@@ -75,16 +92,22 @@
                         return false;
                     };
 
-                    $scope.refreshSites = function () {
-                        $scope.sites = sitesService.getSites();
-                        $scope.location.path('/sites');
+                    $scope.addSiteDialog = function (ev) {
+                        exDialog.openPrime({
+                            scope: $scope,
+                            template: '/theme/apps/unifiHotspot/ngExDialog/addNewSite.html',
+                            controller: 'addSiteController',
+                            width: '450px',
+                            grayBackground: true,
+                            draggable: false
+                        });
                     };
 
                     $scope.currentSite = function () {
                         var siteId = $scope.location.path().replace('/sites/', '');
                         var site = siteId;
 
-                        var sorted = $filter('orderBy')($scope.sites, 'title');
+                        var sorted = $filter('orderBy')($rootScope.sites, 'title');
 
                         if (siteId === '/sites') {
                             if (sorted.length > 0) {
@@ -107,6 +130,42 @@
                     };
                 }
             ])
+            .controller('addSiteController', ['$scope', '$rootScope', 'sitesService', function ($scope, $rootScope, sitesService) {
+                    $scope.newSite = {};
+                    $scope.save = function () {
+                        if (isBlank($scope.newSite.name) || isBlank($scope.newSite.title)) {
+
+                        } else {
+                            $.ajax({
+                                url: '/unifiHotspot/',
+                                type: 'POST',
+                                dataType: 'JSON',
+                                data: {
+                                    createNew: 'createNew',
+                                    id: $scope.newSite.name,
+                                    title: $scope.newSite.title
+                                },
+                                success: function (resp) {
+                                    if (resp.status) {
+                                        $rootScope.sites = sitesService.getSites();
+                                        $scope.closeThisDialog("close");
+                                        flog('success', resp);
+                                    } else {
+
+                                    }
+                                },
+                                error: function () {
+
+                                }
+                            });
+                        }
+                    };
+
+                    $scope.cancel = function () {
+                        $scope.closeThisDialog("close");
+                    };
+                }
+            ])
             .config(['$routeProvider', function ($routeProvider) {
                     $routeProvider
                             .otherwise({
@@ -126,15 +185,10 @@
         $('#loading').addClass('hide');
     });
 
-    function dynamicSort(property) {
-        var sortOrder = 1;
-        if (property[0] === "-") {
-            sortOrder = -1;
-            property = property.substr(1);
+    function isBlank(s) {
+        if (s === null || typeof s === 'undefined') {
+            return true;
         }
-        return function (a, b) {
-            var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
-            return result * sortOrder;
-        };
+        return s.toString().trim().length < 1;
     }
 })();

@@ -1,102 +1,40 @@
 <html>
     <head>
         <title>UniFi Hotspot</title>
-        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.7/angular-material.min.css">
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc4/angular-material.min.css">
+        <link rel="stylesheet" type="text/css" href="/theme/apps/unifiHotspot/ngExDialog/ngExDialog.css"/>
         <style>
-            .panel-tools {
-                position: absolute;
-                right: 5px;
-                top: 4px;
-            }
-
-            .uf-navbar{
-                position: relative !important;
-                min-height: 50px !important;
-                margin-bottom: 20px !important;
-                border: 1px solid transparent !important;
-                background-color: #1292C5;
-                border-color: #1B95C5;
-            }
-
-            .uf-navbar > .container-fluid > .navbar-collapse > .nav > .dropdown a{
-                color: #FFF;
-            }
-
-            .uf-navbar a.navbar-brand{
-                color: #FFF;
-            }
-
-            .uf-navbar > .container-fluid > .navbar-collapse > .nav > .dropdown a:hover{
-                background-color: #027BAB;
-            }
-
-            .uf-navbar > .container-fluid > .navbar-collapse > .nav > .open > a, a:hover, a:focus, a:active{
-                background-color: #027BAB;
-                border-color: #337ab7;
-            }
-
-            .uf-navbar > .container-fluid > .navbar-collapse > .nav > .open > .dropdown-menu{
-                background-color: #027BAB;
-                border-color: #027BAB;
-            }
-
-            .uf-navbar .navbar-collapse.collapse {
-                display: block!important;
-            }
-
-            .uf-navbar .navbar-nav>li, .navbar-nav {
-                float: left !important;
-            }
-
-            .uf-navbar .navbar-nav.navbar-right:last-child {
-                margin-right: -15px !important;
-            }
-
-            .uf-navbar .navbar-right {
-                float: right!important;
-            }
-
-            .btn-uf, .btn-uf:hover, .btn-uf:active, .btn-uf:focus, .btn-uf:checked{
-                color: #fff;
-                background-color: #027BAB;
-                border-color: #027BAB;
+            ul.md-primary{
+                background-color: #3F51B5;
             }
         </style>
     </head>
     <body>
-        <button class="md-raised md-primary md-button md-ink-ripple" type="button" ng-transclude="" aria-label="Primary">
-            <span class="ng-scope">Primary</span>
-        </button>
         <div ng-app="unifiApp" class="hide">
-            <nav class="navbar uf-navbar" ng-controller="sitesCtrl">
-                <div class="container-fluid">
-                    <div class="navbar-header">
-                        <a class="navbar-brand" href="#/sites">
-                            <i class="fa fa-home fa-2x"></i>
-                        </a>
-                    </div>
-
-                    <!-- Collect the nav links, forms, and other content for toggling -->
-                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                        <ul class="nav navbar-nav">
-                            <li class="dropdown">
-                                <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                    <strong>{{currentSite()}}</strong> <span class="caret"></span>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li ng-repeat="site in sites| orderBy: 'title'">
-                                        <a href="#/sites/{{site.id}}">{{site.title}}</a>
-                                    </li>
-                                    <li role="separator" ng-show="sites.length > 0" class="divider"></li>
-                                    <li class="text-center">
-                                        <button type="button" class="btn btn-uf" data-toggle="modal" data-target="#modal-add-site"><i class="fa fa-plus"></i> Add a Site</button>
-                                    </li>
-                                </ul>
+            <div ng-controller="sitesCtrl">
+                <md-toolbar>
+                    <div class="md-toolbar-tools">
+                        <md-button class="dropdown-toggle" data-toggle="dropdown">
+                            <strong>{{currentSite()}}</strong> <span class="caret"></span>
+                        </md-button>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat="site in sites"><md-button class="md-primary">{{site.title}}</md-button></li>
+                            <li role="separator" ng-show="sites.length > 0" class="divider"></li>
+                            <li class="text-center">
+                            <md-button class="md-primary" ng-click="addSiteDialog($event)">
+                                <i class="fa fa-plus"></i> Add a site
+                            </md-button>
                             </li>
                         </ul>
-                    </div><!-- /.navbar-collapse -->
-                </div><!-- /.container-fluid -->
-            </nav>
+                    </div>
+                </md-toolbar>
+                <md-content ng-show="sites.length < 1">
+                    <div class="center">
+                        <md-button class="md-raised md-accent" ng-click="addSiteDialog($event)"><i class="fa fa-plus"></i> Add your first site</md-button>
+                        <p>{{status}}</p>
+                    </div>
+                </md-content>
+            </div>
             <div ng-view></div>
         </div>
         <div id="loading">
@@ -105,42 +43,14 @@
             </div>
         </div>
 
-        <!-- Start Modal -->
-        <div id="modal-add-site" class="modal modal-md fade" aria-hidden="true">
-            <form action="." method="POST" class="form-horizontal">
-                <input class="action" type="hidden" name="createNew" value="createNew"/>
-                <div class="modal-header">
-                    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">&times;</button>
-                    <h4 class="modal-title">Add a new site</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label class="col-md-4 control-label" for="title">Title</label>
-                        <div class="col-md-8">
-                            <input class="form-control required" type="text" id="title" name="title" placeholder="e.g. Office" />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label" for="id">ID</label>
-                        <div class="col-md-8">
-                            <input class="form-control required" type="text" id="id" name="id" placeholder="e.g. default" />
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-sm btn-default" data-dismiss="modal" type="button">Close</button>
-                    <button type="button" class="btn btn-sm btn-primary btn-create" data-type="form-submit">Create</button>
-                </div>
-            </form>
-        </div>
-        <!-- End Modal -->
-
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js">//</script>
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-route.min.js">//</script>
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-resource.min.js">//</script>
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js">//</script>
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-touch.min.js">//</script>
-        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.7/angular-material.min.js">//</script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-aria.min.js">//</script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc4/angular-material.min.js">//</script>
+        <script type="text/javascript" src="/theme/apps/unifiHotspot/ngExDialog/ngExDialog.js">//</script>
         <script type="text/javascript" src="/theme/apps/unifiHotspot/manageUnifiApp.js">//</script>
     </body>
 </html>
