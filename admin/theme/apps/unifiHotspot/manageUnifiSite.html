@@ -23,18 +23,23 @@
                                     <th>Down</th>
                                     <th>Byte Quota</th>
                                     <th>Duration</th>
+                                    <th>Devices</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                #foreach($voucher in $page.attributes.vouchers.hits.hits)
-                                #set($v = $voucher.source)
-                                <tr>
+                                #foreach($v in $page.attributes.vouchers)
+                                <tr data-code="$v.code">
                                     <td>$v.code.substring(0,5)-$v.code.substring(5)</td>
                                     <td>$formatter.formatDateTime($formatter.parseDate($v.createdDate), $page.organisation.timezone)</td>
                                     <td>$!v.upLimit</td>
                                     <td>$!v.downLimit</td>
                                     <td>$!v.bytesLimit</td>
                                     <td>$!v.minutes</td>
+                                    <td>$!v.macs.length</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-danger btn-del-voucher"><i class="fa fa-times"></i></button>
+                                    </td>
                                 </tr>
                                 #end
                             </tbody>
@@ -49,28 +54,30 @@
                         Details
                     </div>
                     <div class="panel-body">
-                        <form class="form-horizontal">
-                            <div class="form-group">
-                                <label for="site_id" class="col-sm-2 control-label">ID</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control required" name="id" id="site_id" placeholder="e.g. default" value="$page.attributes.site.id"/>
+                        <form class="form-horizontal" id="details_form">
+                            <div id="site_details">
+                                <div class="form-group">
+                                    <label for="site_id" class="col-sm-2 control-label">ID</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control required" name="id" id="site_id" placeholder="e.g. default" value="$page.attributes.site.id"/>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="site_title" class="col-sm-2 control-label">Title</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control required" id="site_title" name="title" placeholder="e.g. Office" value="$page.attributes.site.title" />
+                                <div class="form-group">
+                                    <label for="site_title" class="col-sm-2 control-label">Title</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control required" id="site_title" name="title" placeholder="e.g. Office" value="$page.attributes.site.get('title')" />
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="site_notes" class="col-sm-2 control-label">Notes</label>
-                                <div class="col-sm-10">
-                                    <textarea class="form-control" rows="10" id="site_notes" name="title" placeholder="Notes" value="$!page.attributes.site.notes" ></textarea>
+                                <div class="form-group">
+                                    <label for="site_notes" class="col-sm-2 control-label">Notes</label>
+                                    <div class="col-sm-10">
+                                        <textarea class="form-control" rows="10" id="site_notes" name="notes" placeholder="Notes" >$!page.attributes.sites.notes</textarea>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="col-sm-offset-2 col-sm-10">
-                                    <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> Save</button>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-2 col-sm-10">
+                                        <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> Save</button>
+                                    </div>
                                 </div>
                             </div>
                         </form>
