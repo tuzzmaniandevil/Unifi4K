@@ -10,15 +10,9 @@
             .adminController()
             .path("/unifiHotspot/$")
             .enabled(true)
-            .addMethod('POST', '_addSite', 'createNew')
-            .defaultView(views.templateView('/theme/apps/unifiHotspot/manageUnifiApp.html'))
-            .build();
-
-    controllerMappings
-            .adminController()
-            .path("/unifiHotspot/sites\.json$")
-            .enabled(true)
             .addMethod('GET', '_getSites')
+            .addMethod('POST', '_addSite', 'createNew')
+            .defaultView(views.templateView('/theme/apps/unifiHotspot/manageUnifiSites.html'))
             .build();
 
     g._getSites = function (page, params) {
@@ -64,11 +58,11 @@
             }
 
             jp.voucherCount = voucherC;
-            
+
             json.push(jp);
         }
 
-        return views.textView(JSON.stringify(json), 'application/json');
+        page.attributes.sites = json;
     };
 
     g._addSite = function (page, params) {
@@ -97,7 +91,8 @@
             id: newId,
             title: newTitle,
             createdBy: curUser.thisProfile.id,
-            createdDate: formatter.formatDateISO8601(formatter.now)
+            createdDate: formatter.formatDateISO8601(formatter.now),
+            notes: ''
         };
 
         db.createNew(siteName, JSON.stringify(d), _config.RECORD_TYPES.SITE);

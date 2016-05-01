@@ -10,16 +10,13 @@
             .adminController()
             .path("/unifiHotspot/(?<site>[^/]*)/$")
             .enabled(true)
-            .addMethod('POST', '_addVoucher', 'createNew')
-            .addPathResolver('site', '_resolveSite')
-            .build();
-
-    controllerMappings
-            .adminController()
-            .path("/unifiHotspot/(?<site>[^/]*)/site.json$")
-            .enabled(true)
             .addMethod('GET', '_getVouchers')
+            .addMethod('POST', '_addVoucher', 'createNew')
+            .defaultView(views.templateView('/theme/apps/unifiHotspot/manageUnifiSite.html'))
             .addPathResolver('site', '_resolveSite')
+            .title(function (page) {
+                return 'UniFi Hotspot: ' + page.attributes.site.title;
+            })
             .build();
 
     g._getVouchers = function (page) {
@@ -76,7 +73,7 @@
 
         siteJson.vouchers = vouchers;
 
-        return views.textView(JSON.stringify(siteJson, null, '\t'), 'application/json');
+        page.attributes.site = siteJson;
     };
 
     g._addVoucher = function (page, params) {

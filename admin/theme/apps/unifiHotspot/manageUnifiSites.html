@@ -36,8 +36,8 @@
                             <td>
                                 <a href="$s.id/">$s.id</a>
                             </td>
-                            <td>$s.get('title')</td>
-                            <td>$formatter.ifNull($page.attributes.voucherCount.get($s.id),0)</td>
+                            <td>$s.title</td>
+                            <td>$formatter.ifNull($s.voucherCount,0)</td>
                         </tr>
                         #end
                     </tbody>
@@ -55,17 +55,17 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="col-md-4 control-label" for="title">Title</label>
-                        <div class="col-md-8">
-                            <input class="form-control required" type="text" id="title" name="title" placeholder="e.g. Office" />
-                        </div>
-                    </div>
-                    <div class="form-group">
                         <label class="col-md-4 control-label" for="id">ID</label>
                         <div class="col-md-8">
                             <input class="form-control required" type="text" id="id" name="id" placeholder="e.g. default" />
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="title">Title</label>
+                        <div class="col-md-8">
+                            <input class="form-control required" type="text" id="title" name="title" placeholder="e.g. Office" />
+                        </div>
+                    </div>                    
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-sm btn-default" data-dismiss="modal" type="button">Close</button>
