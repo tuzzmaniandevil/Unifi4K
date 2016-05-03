@@ -224,8 +224,21 @@
         return _self._doPost('/api/s/' + s + '/cmd/stamgr', params, cb);
     };
 
-    UniFi.prototype.backup = function (site, cb) {
+    /**
+     * Queries the controller to do a backup and returns the URL of the file
+     *
+     * @param {Integer} days
+     * @param {String} site
+     * @param {Function} cb
+     * @returns {JSON}
+     */
+    UniFi.prototype.backup = function (days, site, cb) {
         var _self = this;
+
+        if (typeof days === 'function') {
+            cb = days;
+            days = -1;
+        }
 
         if (typeof site === 'function') {
             cb = site;
@@ -235,10 +248,59 @@
         var s = site || _self._options.site;
 
         var params = {
-            'cmd': 'backup'
+            cmd: "backup",
+            days: "-1"
         };
 
         return _self._doPost('/api/s/' + s + '/cmd/system', params, cb);
+    };
+
+    /**
+     *
+     * @param {Integer} days
+     * @param {String} site
+     * @param {Function} cb
+     * @returns {JSON}
+     */
+    UniFi.prototype.backupDownload = function (days, site, cb) {
+        var _self = this;
+
+        if (typeof days === 'function') {
+            cb = days;
+            days = -1;
+        }
+
+        if (typeof site === 'function') {
+            cb = site;
+            site = null;
+        }
+
+        var s = site || _self._options.site;
+
+        var params = {
+            cmd: "backup",
+            days: "-1"
+        };
+
+        var result = _self._doPost('/api/s/' + s + '/cmd/system', params);
+        if (result.status) {
+            var url = result.data.data[0].url;
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.open('GET', 'https://' + _self._options.hostname + ':' + _self._options.port + url, false);
+            xmlhttp.setRequestHeader('Cookie', _self._cookie);
+
+            var data = null;
+
+            xmlhttp.onloadend = function () {
+                data = xmlhttp.response.responseBodyAsBytes;
+            };
+
+            xmlhttp.send();
+
+            return data;
+        } else {
+            return null;
+        }
     };
 
     /**
@@ -287,6 +349,7 @@
 
         var result = {
             status: false,
+            code: null,
             data: null
         };
 
@@ -299,6 +362,7 @@
                 try {
                     result.data = JSON.parse(xmlhttp.responseText);
                 } catch (ex) {
+                    result.error = ex;
                 }
             }
 
@@ -308,7 +372,10 @@
                     result = _self._doHttpRequest(path, type, data, cb, autologin);
                 }
             } else if (statusCode === 200) {
+                result.code = statusCode;
                 result.status = true;
+            } else {
+                result.code = statusCode;
             }
         };
 

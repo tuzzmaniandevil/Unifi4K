@@ -10,6 +10,7 @@
             .adminController()
             .path("/unifiHotspot/$")
             .enabled(true)
+            .addMethod('GET', '_getBackup', 'backup')
             .addMethod('GET', '_getSites')
             .addMethod('POST', '_addSite', 'createNew')
             .defaultView(views.templateView('/theme/apps/unifiHotspot/manageUnifiSites.html'))
@@ -63,6 +64,15 @@
         }
 
         page.attributes.sites = json;
+    };
+
+    g._getBackup = function () {
+        var result = g._unifi.backupDownload();
+
+        if (result) {
+            var hash = fileManager.upload(result);
+            return views.textView(hash);
+        }
     };
 
     g._addSite = function (page, params) {

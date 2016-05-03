@@ -2,6 +2,7 @@
     // init UniFi controller
     g._unifi = new UniFi({
         hostname: 'unifi.tuzza.co',
+        port: 443,
         username: 'admin',
         password: 'Dylan3814'
     });
