@@ -224,6 +224,23 @@
         return _self._doPost('/api/s/' + s + '/cmd/stamgr', params, cb);
     };
 
+    UniFi.prototype.backup = function (site, cb) {
+        var _self = this;
+
+        if (typeof site === 'function') {
+            cb = site;
+            site = null;
+        }
+
+        var s = site || _self._options.site;
+
+        var params = {
+            'cmd': 'backup'
+        };
+
+        return _self._doPost('/api/s/' + s + '/cmd/system', params, cb);
+    };
+
     /**
      *
      * @param {String} path
